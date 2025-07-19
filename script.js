@@ -1,3 +1,7 @@
+// Store selected products in an array
+let selectedProducts = [];
+loadSelectedProducts(); // Load selected products on page load
+
 /* Get references to DOM elements */
 const categoryFilter = document.getElementById("categoryFilter");
 const productsContainer = document.getElementById("productsContainer");
@@ -39,8 +43,9 @@ async function loadProducts() {
   return data.products;
 }
 
-// Store selected products in an array
-let selectedProducts = [];
+
+// Load selected products from localStorage on page load
+loadSelectedProducts();
 
 /* Create HTML for displaying product cards and enable selection and modal */
 function displayProducts(products) {
@@ -83,6 +88,8 @@ function displayProducts(products) {
         // Already selected, remove from selectedProducts
         selectedProducts.splice(index, 1);
       }
+      // Save to localStorage after change
+      saveSelectedProducts();
       // Re-render products and selected list
       displayProducts(products);
       updateSelectedProducts();
@@ -171,6 +178,7 @@ function updateSelectedProducts() {
     btn.addEventListener("click", (e) => {
       e.stopPropagation(); // Prevent triggering card click
       selectedProducts.splice(idx, 1);
+      saveSelectedProducts();
       updateSelectedProducts();
       // Update product card highlights in the current grid
       const productCards = document.querySelectorAll(".product-card");
@@ -380,10 +388,23 @@ function appendMessage(msg) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-// On page load, show empty selected products
+// On page load, show selected products (if any)
 updateSelectedProducts();
 
 // Utility: create a slight delay for the "Thinking..." message
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Save selected products to localStorage
+function saveSelectedProducts() {
+  localStorage.setItem("selectedProducts", JSON.stringify(selectedProducts));
+}
+
+// Load selected products from localStorage
+function loadSelectedProducts() {
+  const savedProducts = localStorage.getItem("selectedProducts");
+  if (savedProducts) {
+    selectedProducts = JSON.parse(savedProducts);
+  }
 }
