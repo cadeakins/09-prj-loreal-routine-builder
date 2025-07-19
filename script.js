@@ -39,21 +39,92 @@ async function loadProducts() {
   return data.products;
 }
 
-/* Create HTML for displaying product cards */
+// Store selected products in an array
+let selectedProducts = [];
+
+/* Create HTML for displaying product cards and enable selection */
 function displayProducts(products) {
   productsContainer.innerHTML = products
-    .map(
-      (product) => `
-    <div class="product-card">
+    .map((product) => {
+      // Check if this product is selected
+      const isSelected = selectedProducts.some((p) => p.name === product.name);
+      return `
+    <div class="product-card${
+      isSelected ? " selected" : ""
+    }" data-product-name="${product.name}">
       <img src="${product.image}" alt="${product.name}">
       <div class="product-info">
         <h3>${product.name}</h3>
         <p>${product.brand}</p>
       </div>
     </div>
-  `
+  `;
+    })
+    .join("");
+
+  // Add click event listeners to each product card
+  const productCards = document.querySelectorAll(".product-card");
+  productCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const name = card.getAttribute("data-product-name");
+      // Find the product in the current list
+      const product = products.find((p) => p.name === name);
+      // Check if already selected
+      const index = selectedProducts.findIndex((p) => p.name === name);
+      if (index === -1) {
+        // Not selected, add to selectedProducts
+        selectedProducts.push(product);
+      } else {
+        // Already selected, remove from selectedProducts
+        selectedProducts.splice(index, 1);
+      }
+      // Re-render products and selected list
+      displayProducts(products);
+      updateSelectedProducts();
+    });
+  });
+}
+
+// Update the Selected Products section
+function updateSelectedProducts() {
+  const selectedList = document.getElementById("selectedProductsList");
+  if (!selectedList) return;
+  if (selectedProducts.length === 0) {
+    selectedList.innerHTML =
+      '<div class="placeholder-message">No products selected yet.</div>';
+    return;
+  }
+  selectedList.innerHTML = selectedProducts
+    .map(
+      (product, idx) => `
+      <div class="selected-product-item" data-index="${idx}">
+        <img src="${product.image}" alt="${product.name}" style="width:40px;height:40px;object-fit:contain;vertical-align:middle;">
+        <span>${product.name}</span>
+        <button class="remove-selected-btn" title="Remove" aria-label="Remove ${product.name}">&times;</button>
+      </div>
+    `
     )
     .join("");
+
+  // Add event listeners to remove buttons
+  const removeBtns = selectedList.querySelectorAll(".remove-selected-btn");
+  removeBtns.forEach((btn, idx) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent triggering card click
+      selectedProducts.splice(idx, 1);
+      updateSelectedProducts();
+      // Update product card highlights in the current grid
+      const productCards = document.querySelectorAll(".product-card");
+      productCards.forEach((card) => {
+        const name = card.getAttribute("data-product-name");
+        if (selectedProducts.some((p) => p.name === name)) {
+          card.classList.add("selected");
+        } else {
+          card.classList.remove("selected");
+        }
+      });
+    });
+  });
 }
 
 /* Filter and display products when category changes */
@@ -68,6 +139,7 @@ categoryFilter.addEventListener("change", async (e) => {
   );
 
   displayProducts(filteredProducts);
+  updateSelectedProducts();
 });
 
 // Chat form submission handler for OpenAI integration
@@ -141,6 +213,9 @@ function appendMessage(msg) {
   chatWindow.appendChild(msgDiv);
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
+
+// On page load, show empty selected products
+updateSelectedProducts();
 
 // Utility: create a slight delay for the "Thinking..." message
 function delay(ms) {

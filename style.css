@@ -299,6 +299,19 @@ body {
   display: flex;
   gap: 15px;
   min-height: 160px;
+  cursor: pointer;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+  border-color: #ff003b;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-card.selected {
+  border: 2.5px solid #ff003b;
+  box-shadow: 0 0 0 2px #ff003b33;
+  background: #fff6f8;
 }
 
 .product-card img {
@@ -332,6 +345,7 @@ body {
   padding: 20px;
   border: 2px solid #000;
   border-radius: 8px;
+  min-height: 80px;
 }
 
 .selected-products h2 {
@@ -343,6 +357,43 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  align-items: center;
+}
+
+.selected-product-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f0f0;
+  border-radius: 6px;
+  padding: 4px 10px 4px 4px;
+  font-size: 15px;
+  border: 1.5px solid #ddd;
+  margin-bottom: 4px;
+}
+
+.selected-product-item img {
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid #eee;
+}
+
+.remove-selected-btn {
+  background: none;
+  border: none;
+  color: #ff003b;
+  font-size: 22px;
+  cursor: pointer;
+  margin-left: 4px;
+  line-height: 1;
+  padding: 0 4px;
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+.remove-selected-btn:hover,
+.remove-selected-btn:focus {
+  background: #ffe5ec;
+  outline: none;
 }
 
 .generate-btn {
