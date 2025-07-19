@@ -43,7 +43,6 @@ async function loadProducts() {
   return data.products;
 }
 
-
 // Load selected products from localStorage on page load
 loadSelectedProducts();
 
@@ -272,6 +271,11 @@ const generateRoutineBtn = document.getElementById("generateRoutine");
 
 // Add click event listener for Generate Routine
 generateRoutineBtn.addEventListener("click", async () => {
+  // Only clear the chat window if the initial message is still displayed
+  if (initialMessageDisplayed) {
+    chatWindow.innerHTML = "";
+    initialMessageDisplayed = false;
+  }
   // If no products are selected, show an alert and stop
   if (selectedProducts.length === 0) {
     alert("Please select at least one product to generate a routine.");
